@@ -1,5 +1,4 @@
-// Frontend fetch wrappers for /api/tracks routes —
-// abstracts HTTP calls to the backend tracks API
+import axios from 'axios';
 
 /**
  * Upload a new audio track with metadata.
@@ -7,7 +6,10 @@
  * @returns {Promise<object>} created Track object
  */
 export async function uploadTrack(formData) {
-  // TODO: implement
+  const response = await axios.post('/api/tracks/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
 }
 
 /**
@@ -15,7 +17,8 @@ export async function uploadTrack(formData) {
  * @returns {Promise<object[]>} array of Track objects
  */
 export async function getAllTracks() {
-  // TODO: implement
+  const response = await axios.get('/api/tracks');
+  return response.data;
 }
 
 /**
@@ -24,7 +27,8 @@ export async function getAllTracks() {
  * @returns {Promise<object>} Track object
  */
 export async function getTrackById(id) {
-  // TODO: implement
+  const response = await axios.get(`/api/tracks/${id}`);
+  return response.data;
 }
 
 /**
@@ -33,5 +37,6 @@ export async function getTrackById(id) {
  * @returns {Promise<object>} updated Track object with analysis
  */
 export async function analyzeTrack(id) {
-  // TODO: implement
+  const response = await axios.post(`/api/tracks/${id}/analyze`);
+  return response.data;
 }

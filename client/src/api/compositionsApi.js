@@ -1,12 +1,12 @@
-// Frontend fetch wrappers for /api/compositions routes —
-// abstracts HTTP calls to the backend compositions API
+import axios from 'axios';
 
 /**
  * Trigger Claude to generate a new composition from available tracks.
  * @returns {Promise<object>} newly created Composition object
  */
 export async function generateComposition() {
-  // TODO: implement
+  const response = await axios.post('/api/compositions/generate');
+  return response.data;
 }
 
 /**
@@ -14,7 +14,8 @@ export async function generateComposition() {
  * @returns {Promise<object[]>} array of Composition objects
  */
 export async function getAllCompositions() {
-  // TODO: implement
+  const response = await axios.get('/api/compositions');
+  return response.data;
 }
 
 /**
@@ -23,7 +24,8 @@ export async function getAllCompositions() {
  * @returns {Promise<object>} Composition object
  */
 export async function getCompositionById(id) {
-  // TODO: implement
+  const response = await axios.get(`/api/compositions/${id}`);
+  return response.data;
 }
 
 /**
@@ -33,5 +35,6 @@ export async function getCompositionById(id) {
  * @returns {Promise<object>} updated Composition object
  */
 export async function addTrackToComposition(compositionId, trackId) {
-  // TODO: implement
+  const response = await axios.post(`/api/compositions/${compositionId}/tracks`, { trackId });
+  return response.data;
 }

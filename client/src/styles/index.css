@@ -1,6 +1,117 @@
-/* Global styles for OrchestrAI — imports Tailwind base, components, and utilities */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* TODO: add custom global styles here */
+@layer base {
+  html {
+    background: #070913;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    background: #070913;
+    color: #f8fafc;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply rounded-md px-3 py-2 text-slate-300 transition hover:bg-white/10 hover:text-white;
+  }
+
+  .nav-link-active {
+    @apply bg-white/10 text-white;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-11 items-center justify-center rounded-md border border-violet-300/20 bg-gradient-to-r from-violet-600 to-sky-500 px-5 py-3 font-bold text-white shadow-glow transition hover:from-violet-500 hover:to-sky-400 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-11 items-center justify-center rounded-md border border-white/10 bg-white/5 px-5 py-3 font-bold text-slate-100 transition hover:border-white/20 hover:bg-white/10;
+  }
+
+  .panel {
+    @apply rounded-lg border border-white/10 bg-slate-900/70 p-6 shadow-2xl shadow-black/30 backdrop-blur sm:p-8;
+  }
+
+  .card {
+    @apply rounded-lg border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-black/20 transition hover:-translate-y-1 hover:border-violet-300/30 hover:shadow-glow;
+  }
+
+  .flow-step {
+    @apply flex items-center gap-4 rounded-lg border border-white/10 bg-white/5 p-4;
+  }
+
+  .flow-step span {
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-sky-400 font-black text-white;
+  }
+
+  .drop-zone {
+    @apply flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-slate-500 bg-slate-950/60 px-5 text-center transition hover:border-violet-300 hover:bg-violet-950/20;
+  }
+
+  .drop-zone-active {
+    @apply border-sky-300 bg-sky-950/20;
+  }
+
+  .field {
+    @apply block;
+  }
+
+  .field span,
+  .label {
+    @apply text-xs font-bold uppercase tracking-[0.18em] text-slate-500;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    @apply mt-2 w-full rounded-md border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-violet-300 focus:ring-2 focus:ring-violet-500/30;
+  }
+
+  .field textarea {
+    @apply resize-none;
+  }
+
+  .waveform {
+    @apply my-7 flex h-20 items-center gap-1.5 rounded-md border border-white/10 bg-slate-950/70 px-4;
+  }
+
+  .waveform span {
+    @apply block w-full rounded-full bg-gradient-to-t from-violet-500 via-sky-400 to-cyan-200;
+  }
+
+  .listening-ring {
+    width: 116px;
+    height: 116px;
+    border-radius: 9999px;
+    background:
+      radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 12%, transparent 13%),
+      conic-gradient(from 0deg, #8b5cf6, #38bdf8, #8b5cf6);
+    box-shadow: 0 0 46px rgba(139, 92, 246, 0.55);
+    animation: pulse-listen 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse-listen {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.82;
+  }
+
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
