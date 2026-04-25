@@ -38,3 +38,14 @@ export async function addTrackToComposition(compositionId, trackId) {
   const response = await axios.post(`/api/compositions/${compositionId}/add`, { trackId });
   return response.data;
 }
+
+/**
+ * Build a merge plan for aligning a new track into a composition.
+ * @param {string} compositionId
+ * @param {string} trackId
+ * @returns {Promise<{ merge_plan: object }>}
+ */
+export async function getMergePlan(compositionId, trackId) {
+  const response = await axios.post(`/api/compositions/${compositionId}/merge`, { trackId });
+  return response.data;
+}
