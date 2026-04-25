@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { getCompositionById } from '../api/compositionsApi';
 
 function getTrackUrl(track) {
-  return track.file_url || (track.filename ? `/uploads/${encodeURIComponent(track.filename)}` : '');
+  return track.file_url || (track.gridfsId ? `/audio/${track.gridfsId}` : '');
 }
 
 function formatTrackName(track) {

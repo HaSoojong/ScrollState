@@ -16,6 +16,7 @@ const trackSchema = new mongoose.Schema({
   bpm_detected: { type: Number, default: null },
   dominant_freq_range: { type: String, default: null },
   duration: { type: Number, required: true },
+  audio_signature: { type: String, default: null, index: true },
   analysis: { type: mongoose.Schema.Types.Mixed, default: null },
   uploadedAt: { type: Date, default: Date.now }
 }, { timestamps: false });

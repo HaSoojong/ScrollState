@@ -1,18 +1,10 @@
-// Multer configuration for audio file uploads into GridFS.
+// Multer configuration for audio file uploads.
 'use strict';
 
 const multer = require('multer');
-const { GridFsStorage } = require('multer-gridfs-storage');
 const { isValidMimeType } = require('../utils/audioValidation');
 
-const storage = new GridFsStorage({
-  url: process.env.MONGODB_URI || 'mongodb://localhost:27017/orchestrai',
-  options: { useNewUrlParser: true, useUnifiedTopology: true },
-  file: (req, file) => ({
-    bucketName: 'audioFiles',
-    filename: `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`,
-  }),
-});
+const storage = multer.memoryStorage();
 
 function fileFilter(req, file, cb) {
   if (isValidMimeType(file.mimetype)) {
