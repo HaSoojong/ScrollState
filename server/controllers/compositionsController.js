@@ -1,17 +1,22 @@
-// Handler functions for /api/compositions routes —
-// each function receives (req, res, next) and delegates to services
+// Handler functions for /api/compositions routes.
 'use strict';
 
 const fileStorage = require('../services/fileStorage');
 const conductorAgent = require('../services/conductorAgent');
-const { generateId } = require('../utils/uuid');
+
+function stringifyId(id) {
+  return id?.toString?.() || String(id);
+}
 
 function enrichComposition(composition, tracks) {
-  const compositionTracks = tracks.filter((track) => (composition.track_ids || []).includes(track.id));
+  const trackIds = new Set((composition.track_ids || []).map(stringifyId));
+  const compositionTracks = tracks.filter((track) => trackIds.has(stringifyId(track.id || track._id)));
   const firstTrack = compositionTracks[0] || {};
 
   return {
     ...composition,
+    id: stringifyId(composition.id || composition._id),
+    track_ids: Array.from(trackIds),
     tracks: compositionTracks,
     instruments: compositionTracks.map((track) => track.instrument).filter(Boolean),
     genre: firstTrack.genre || 'Collaborative',
@@ -20,43 +25,35 @@ function enrichComposition(composition, tracks) {
   };
 }
 
-/**
- * POST /api/compositions/generate
- * Calls the conductor agent to match analyzed tracks into a new composition.
- */
+// POST /api/compositions/generate
 async function generateComposition(req, res, next) {
   try {
-    // Get all tracks that have been analyzed
     const allTracks = await fileStorage.readAll('tracks.json');
-    const analyzedTracks = allTracks.filter(t => t.analysis !== null);
+    const analyzedTracks = allTracks.filter((track) => track.analysis !== null);
 
     if (analyzedTracks.length === 0) {
       return res.status(400).json({ error: 'No analyzed tracks available. Please analyze tracks first.' });
     }
 
-    const compositionPlan = await conductorAgent.conductComposition(analyzedTracks);
+    const plan = await conductorAgent.conductComposition(analyzedTracks);
 
     const newComposition = {
-      id: generateId(),
-      title: compositionPlan.title,
-      track_ids: compositionPlan.track_ids,
-      conductor_notes: compositionPlan.conductor_notes,
-      missing_parts: compositionPlan.missing_parts,
-      help_wanted_prompt: compositionPlan.help_wanted_prompt,
-      createdAt: new Date().toISOString(),
+      title: plan.title,
+      track_ids: plan.track_ids,
+      conductor_notes: plan.conductor_notes,
+      missing_parts: plan.missing_parts,
+      help_wanted_prompt: plan.help_wanted_prompt,
     };
 
     const saved = await fileStorage.save('compositions.json', newComposition);
-    return res.status(201).json(saved);
+    const tracks = await fileStorage.readAll('tracks.json');
+    return res.status(201).json(enrichComposition(saved, tracks));
   } catch (err) {
     next(err);
   }
 }
 
-/**
- * GET /api/compositions
- * Returns all compositions from flat-file storage.
- */
+// GET /api/compositions
 async function getAllCompositions(req, res, next) {
   try {
     const compositions = await fileStorage.readAll('compositions.json');
@@ -67,16 +64,12 @@ async function getAllCompositions(req, res, next) {
   }
 }
 
-/**
- * GET /api/compositions/:id
- * Returns a single composition by ID or 404 if not found.
- */
+// GET /api/compositions/:id
 async function getCompositionById(req, res, next) {
   try {
     const composition = await fileStorage.findById('compositions.json', req.params.id);
-    if (!composition) {
-      return res.status(404).json({ error: 'Composition not found' });
-    }
+    if (!composition) return res.status(404).json({ error: 'Composition not found' });
+
     const tracks = await fileStorage.readAll('tracks.json');
     return res.status(200).json(enrichComposition(composition, tracks));
   } catch (err) {
@@ -84,10 +77,7 @@ async function getCompositionById(req, res, next) {
   }
 }
 
-/**
- * POST /api/compositions/:id/add
- * Adds a new track to an existing open composition and re-runs the conductor agent.
- */
+// POST /api/compositions/:id/add
 async function addTrackToComposition(req, res, next) {
   try {
     const { trackId } = req.body;
@@ -99,35 +89,33 @@ async function addTrackToComposition(req, res, next) {
     const track = await fileStorage.findById('tracks.json', trackId);
     if (!track) return res.status(404).json({ error: 'Track not found' });
 
-    // Add track if not already in composition
-    if (!composition.track_ids.includes(trackId)) {
-      const updatedTrackIds = [...composition.track_ids, trackId];
+    const currentIds = (composition.track_ids || []).map(stringifyId);
+    if (!currentIds.includes(trackId)) {
+      const updatedTrackIds = [...currentIds, trackId];
 
-      // Re-run conductor agent on the updated set of tracks
       const allTracks = await fileStorage.readAll('tracks.json');
-      const compositionTracks = allTracks.filter(t => updatedTrackIds.includes(t.id) && t.analysis);
+      const compositionTracks = allTracks.filter(
+        (item) => updatedTrackIds.includes(stringifyId(item.id || item._id)) && item.analysis,
+      );
 
       const newPlan = await conductorAgent.conductComposition(compositionTracks);
 
-      const updatedComposition = await fileStorage.update('compositions.json', req.params.id, {
+      const updated = await fileStorage.update('compositions.json', req.params.id, {
         track_ids: updatedTrackIds,
         conductor_notes: newPlan.conductor_notes,
         missing_parts: newPlan.missing_parts,
         help_wanted_prompt: newPlan.help_wanted_prompt,
       });
 
-      return res.status(200).json(updatedComposition);
+      const tracks = await fileStorage.readAll('tracks.json');
+      return res.status(200).json(enrichComposition(updated, tracks));
     }
 
-    return res.status(200).json(composition);
+    const tracks = await fileStorage.readAll('tracks.json');
+    return res.status(200).json(enrichComposition(composition, tracks));
   } catch (err) {
     next(err);
   }
 }
 
-module.exports = {
-  generateComposition,
-  getAllCompositions,
-  getCompositionById,
-  addTrackToComposition,
-};
+module.exports = { generateComposition, getAllCompositions, getCompositionById, addTrackToComposition };

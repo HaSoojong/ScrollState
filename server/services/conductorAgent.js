@@ -8,6 +8,10 @@ const { callClaude } = require('./claudeClient');
 
 const SYSTEM_PROMPT = `You are an orchestral conductor building compositions from individual musician submissions. Review the provided tracks and create a composition plan. Return ONLY valid JSON with no additional text or markdown.`;
 
+function getTrackId(track) {
+  return track.id || track._id?.toString();
+}
+
 /**
  * Runs the conductor agent to build or update a composition from analyzed tracks.
  * @param {object[]} analyzedTracks - Array of Track objects with populated .analysis fields
@@ -31,7 +35,7 @@ async function conductComposition(tracks) {
 
     return {
       title: primary.piece_name || `${primary.genre || 'Collaborative'} Session`,
-      track_ids: selectedTracks.map((track) => track.id),
+      track_ids: selectedTracks.map(getTrackId).filter(Boolean),
       conductor_notes: `These ${selectedTracks.length} track${selectedTracks.length === 1 ? '' : 's'} share a compatible tempo and mood. Start with ${primary.instrument || 'the foundation track'}, then layer supporting parts to preserve space in the arrangement.`,
       missing_parts: missingParts.length ? missingParts : ['lead melody'],
       help_wanted_prompt: `This composition could use ${missingParts[0] || 'a lead melody'} to complete the arrangement.`,
@@ -41,7 +45,7 @@ async function conductComposition(tracks) {
   const userMessage = `Review these analyzed tracks and create a composition:
 
 ${tracks.map((t, i) => `Track ${i + 1}:
-- ID: ${t.id}
+- ID: ${getTrackId(t)}
 - Instrument: ${t.instrument}
 - Genre: ${t.genre}
 - Piece Name: ${t.piece_name || 'Original'}
