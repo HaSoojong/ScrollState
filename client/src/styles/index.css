@@ -1,0 +1,6 @@
+/* Global styles for OrchestrAI — imports Tailwind base, components, and utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* TODO: add custom global styles here */
