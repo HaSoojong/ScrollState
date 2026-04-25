@@ -10,7 +10,8 @@
  * @param {import('express').NextFunction} next
  */
 function errorHandler(err, req, res, next) {
-  // TODO: implement — log error, determine status code, send JSON response
+  console.error(err.stack);
+  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 }
 
 module.exports = errorHandler;

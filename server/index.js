@@ -7,7 +7,6 @@ const app = require('./app');
 
 const PORT = process.env.PORT || 3001;
 
-// TODO: implement — start the server
 app.listen(PORT, () => {
-  // TODO: log startup message
+  console.log(`🎵 OrchestrAI server running on port ${PORT}`);
 });
