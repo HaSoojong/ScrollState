@@ -3,6 +3,7 @@
 
 const fileStorage = require('../services/fileStorage');
 const conductorAgent = require('../services/conductorAgent');
+const mergeAgent = require('../services/mergeAgent');
 
 function stringifyId(id) {
   return id?.toString?.() || String(id);
@@ -143,4 +144,32 @@ async function addTrackToComposition(req, res, next) {
   }
 }
 
-module.exports = { generateComposition, getAllCompositions, getCompositionById, addTrackToComposition };
+// POST /api/compositions/:id/merge — build merge plan using Claude
+async function mergeTrackIntoComposition(req, res, next) {
+  try {
+    const { trackId } = req.body;
+    if (!trackId) return res.status(400).json({ error: 'trackId is required' });
+
+    const composition = await fileStorage.findById('compositions.json', req.params.id);
+    if (!composition) return res.status(404).json({ error: 'Composition not found' });
+
+    const track = await fileStorage.findById('tracks.json', trackId);
+    if (!track) return res.status(404).json({ error: 'Track not found' });
+
+    const compositionTrackIds = (composition.track_ids || []).map(id => id.toString());
+    const allTracks = await fileStorage.readAll('tracks.json');
+    const existingTracks = allTracks.filter(t => compositionTrackIds.includes(t.id) && t.analysis);
+
+    const mergePlan = await mergeAgent.buildMergePlan(
+      composition,
+      existingTracks,
+      track
+    );
+
+    return res.status(200).json({ merge_plan: mergePlan });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { generateComposition, getAllCompositions, getCompositionById, addTrackToComposition, mergeTrackIntoComposition };

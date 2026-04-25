@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
-import { getCompositionById } from '../api/compositionsApi';
+import { getAllTracks } from '../api/tracksApi';
+import { getCompositionById, getMergePlan } from '../api/compositionsApi';
+import { useMergePlanPlayer } from '../hooks/useMergePlanPlayer';
 
 function getTrackUrl(track) {
   return track.file_url || (track.filename ? `/uploads/${encodeURIComponent(track.filename)}` : '');
@@ -11,10 +13,24 @@ function formatTrackName(track) {
   return track.piece_name || track.name || track.originalName || 'Untitled track';
 }
 
+function buildTrackMap(compositionTracks = [], extraTracks = []) {
+  const map = new Map();
+  [...compositionTracks, ...extraTracks].forEach((track) => {
+    if (!track) return;
+    map.set(String(track.id || track._id), track);
+  });
+  return map;
+}
+
 export default function CompositionPage() {
   const { id } = useParams();
   const [composition, setComposition] = useState(null);
   const [status, setStatus] = useState('loading');
+  const [allTracks, setAllTracks] = useState([]);
+  const [selectedTrackId, setSelectedTrackId] = useState('');
+  const [mergePlan, setMergePlan] = useState(null);
+  const [planStatus, setPlanStatus] = useState('idle');
+  const [planError, setPlanError] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -36,7 +52,61 @@ export default function CompositionPage() {
     };
   }, [id]);
 
-  const tracks = useMemo(() => composition?.tracks || [], [composition]);
+  useEffect(() => {
+    getAllTracks()
+      .then(setAllTracks)
+      .catch(() => setAllTracks([]));
+  }, []);
+
+  const compositionTracks = useMemo(() => composition?.tracks || [], [composition]);
+  const compositionTrackIds = useMemo(
+    () => (composition?.track_ids || []).map((trackId) => String(trackId)),
+    [composition],
+  );
+
+  const availableTracks = useMemo(
+    () => allTracks.filter((track) => !compositionTrackIds.includes(String(track.id))),
+    [allTracks, compositionTrackIds],
+  );
+
+  useEffect(() => {
+    if (!selectedTrackId && availableTracks.length > 0) {
+      setSelectedTrackId(String(availableTracks[0].id));
+    }
+  }, [availableTracks, selectedTrackId]);
+
+  const trackMap = useMemo(
+    () => buildTrackMap(compositionTracks, [availableTracks.find((t) => String(t.id) === selectedTrackId)]),
+    [compositionTracks, availableTracks, selectedTrackId],
+  );
+
+  const { loadAndPrepare, stop, isPlaying, isLoading: audioLoading } = useMergePlanPlayer({
+    mergePlan,
+    trackIdToUrl: (trackId) => {
+      const track = trackMap.get(String(trackId));
+      if (!track) throw new Error(`Missing track ${trackId}`);
+      return getTrackUrl(track);
+    },
+  });
+
+  async function fetchMergePlan() {
+    if (!composition?.id || !selectedTrackId) return;
+    try {
+      setPlanStatus('loading');
+      setPlanError(null);
+      const { merge_plan } = await getMergePlan(composition.id, selectedTrackId);
+      if (merge_plan?.error) {
+        setPlanError(merge_plan.error);
+        setPlanStatus('error');
+        return;
+      }
+      setMergePlan(merge_plan);
+      setPlanStatus('ready');
+    } catch (err) {
+      setPlanError(err?.message || 'Failed to build merge plan');
+      setPlanStatus('error');
+    }
+  }
 
   if (status === 'loading') {
     return (
@@ -79,7 +149,7 @@ export default function CompositionPage() {
         </Link>
       </motion.div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
         <motion.div
           className="panel"
           initial={{ opacity: 0, y: 18 }}
@@ -88,8 +158,8 @@ export default function CompositionPage() {
         >
           <h2 className="text-2xl font-black text-white">Timeline</h2>
           <div className="mt-6 space-y-4">
-            {tracks.length ? (
-              tracks.map((track, index) => (
+            {compositionTracks.length ? (
+              compositionTracks.map((track, index) => (
                 <motion.div
                   key={track.id || track.filename}
                   className="rounded-lg border border-white/10 bg-slate-950/55 p-4"
@@ -111,6 +181,62 @@ export default function CompositionPage() {
             ) : (
               <p className="text-slate-400">No tracks have been attached to this composition yet.</p>
             )}
+          </div>
+
+          <div className="mt-8 rounded-lg border border-emerald-300/20 bg-emerald-950/20 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="font-semibold text-white">AI merge preview (experimental)</h3>
+                <p className="text-sm text-emerald-100/80">Build a Claude merge plan for an incoming track and audition alignment.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="btn-secondary"
+                  onClick={fetchMergePlan}
+                  disabled={!selectedTrackId || planStatus === 'loading'}
+                >
+                  {planStatus === 'loading' ? 'Building plan…' : 'Build merge plan'}
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={loadAndPrepare}
+                  disabled={!mergePlan || audioLoading}
+                >
+                  {isPlaying ? 'Playing…' : audioLoading ? 'Loading…' : 'Play aligned mix'}
+                </button>
+                <button className="btn-tertiary" onClick={stop}>
+                  Stop
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-3">
+              <label className="text-sm font-medium text-slate-200" htmlFor="incoming-track">
+                Incoming track to merge
+              </label>
+              <select
+                id="incoming-track"
+                className="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white"
+                value={selectedTrackId}
+                onChange={(e) => setSelectedTrackId(e.target.value)}
+              >
+                {availableTracks.length === 0 ? <option value="">No available tracks</option> : null}
+                {availableTracks.map((track) => (
+                  <option key={track.id} value={track.id}>
+                    {formatTrackName(track)} ({track.instrument || 'Instrument'})
+                  </option>
+                ))}
+              </select>
+
+              {planError ? <p className="text-sm text-red-300">{planError}</p> : null}
+              {mergePlan ? (
+                <pre className="max-h-64 overflow-auto rounded-md bg-slate-950/80 p-3 text-xs text-emerald-100">
+                  {JSON.stringify(mergePlan, null, 2)}
+                </pre>
+              ) : (
+                <p className="text-sm text-slate-300">No merge plan yet.</p>
+              )}
+            </div>
           </div>
         </motion.div>
 

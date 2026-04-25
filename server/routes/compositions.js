@@ -8,6 +8,10 @@ const compositionsController = require('../controllers/compositionsController');
 // POST /api/compositions/generate — trigger Claude to create a new composition
 router.post('/generate', compositionsController.generateComposition);
 
+// POST /api/compositions/:id/merge — build merge plan for adding a track into composition
+// Expects body: { trackId: string }
+router.post('/:id/merge', compositionsController.mergeTrackIntoComposition);
+
 // GET /api/compositions — list all compositions
 router.get('/', compositionsController.getAllCompositions);
 

@@ -8,10 +8,11 @@
 let audioContext;
 
 export function getAudioContext() {
-  if (!audioContext) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    audioContext = new AudioContextClass();
+  if (typeof window === 'undefined') return null;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) throw new Error('Web Audio API not supported');
+  if (!window.__sharedAudioContext) {
+    window.__sharedAudioContext = new AudioCtx();
   }
-
-  return audioContext;
+  return window.__sharedAudioContext;
 }
