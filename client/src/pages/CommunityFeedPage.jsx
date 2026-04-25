@@ -69,7 +69,10 @@ export default function CommunityFeedPage() {
     try {
       const newComposition = await generateComposition();
       if (newComposition) {
-        setCompositions((current) => [newComposition, ...current]);
+        setCompositions((current) => {
+          const withoutDuplicate = current.filter((composition) => composition.id !== newComposition.id);
+          return [newComposition, ...withoutDuplicate];
+        });
       }
     } catch (error) {
       console.warn('Composition generation backend is unavailable.', error);

@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "id": "984dfc8e-0593-4e62-b1f4-04b961f2fed8",
+    "filename": "1777145485642-idoberg-relaxing-guitar-loop-v5-245859.mp3",
+    "originalName": "idoberg-relaxing-guitar-loop-v5-245859.mp3",
+    "file_url": "/uploads/1777145485642-idoberg-relaxing-guitar-loop-v5-245859.mp3",
+    "mimetype": "audio/mpeg",
+    "size": 585978,
+    "instrument": "Guitar",
+    "genre": "Indie",
+    "piece_name": "Peter",
+    "name": "Peter",
+    "user_description": "",
+    "bpm_detected": 129,
+    "dominant_freq_range": "treble",
+    "duration": 18.311833333333333,
+    "analysis": {
+      "estimated_key": "C major",
+      "mood": "energetic",
+      "energy": "high",
+      "compatible_instruments": [
+        "bass",
+        "vocals",
+        "light percussion"
+      ],
+      "arrangement_notes": "Guitar has a high energy profile around 129 BPM and can anchor a Indie arrangement."
+    },
+    "uploadedAt": "2026-04-25T19:31:25.665Z"
+  },
+  {
+    "id": "9c583cbc-459e-46c4-98c1-be155c0abe02",
+    "filename": "1777145632313-purnanand_wasave-relaxing-guitar-128296.mp3",
+    "originalName": "purnanand_wasave-relaxing-guitar-128296.mp3",
+    "file_url": "/uploads/1777145632313-purnanand_wasave-relaxing-guitar-128296.mp3",
+    "mimetype": "audio/mpeg",
+    "size": 984711,
+    "instrument": "Guitar",
+    "genre": "Indie",
+    "piece_name": "Peter2",
+    "name": "Peter2",
+    "user_description": "",
+    "bpm_detected": 170,
+    "dominant_freq_range": "bass",
+    "duration": 30.772229166666666,
+    "analysis": {
+      "estimated_key": "C major",
+      "mood": "energetic",
+      "energy": "high",
+      "compatible_instruments": [
+        "bass",
+        "vocals",
+        "light percussion"
+      ],
+      "arrangement_notes": "Guitar has a high energy profile around 170 BPM and can anchor a Indie arrangement."
+    },
+    "uploadedAt": "2026-04-25T19:33:52.325Z"
+  }
+]

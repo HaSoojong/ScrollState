@@ -25,6 +25,17 @@ function enrichComposition(composition, tracks) {
   };
 }
 
+function normalizeTrackIds(trackIds = []) {
+  return trackIds.map(stringifyId).filter(Boolean).sort();
+}
+
+function hasSameTrackSet(firstTrackIds = [], secondTrackIds = []) {
+  const first = normalizeTrackIds(firstTrackIds);
+  const second = normalizeTrackIds(secondTrackIds);
+
+  return first.length > 0 && first.length === second.length && first.every((id, index) => id === second[index]);
+}
+
 // POST /api/compositions/generate
 async function generateComposition(req, res, next) {
   try {
@@ -36,10 +47,24 @@ async function generateComposition(req, res, next) {
     }
 
     const plan = await conductorAgent.conductComposition(analyzedTracks);
+    const plannedTrackIds = normalizeTrackIds(plan.track_ids);
+
+    if (plannedTrackIds.length === 0) {
+      return res.status(400).json({ error: 'Conductor did not select any tracks for a composition.' });
+    }
+
+    const existingCompositions = await fileStorage.readAll('compositions.json');
+    const duplicate = existingCompositions.find((composition) => hasSameTrackSet(composition.track_ids, plannedTrackIds));
+    if (duplicate) {
+      return res.status(200).json({
+        ...enrichComposition(duplicate, allTracks),
+        alreadyExists: true,
+      });
+    }
 
     const newComposition = {
       title: plan.title,
-      track_ids: plan.track_ids,
+      track_ids: plannedTrackIds,
       conductor_notes: plan.conductor_notes,
       missing_parts: plan.missing_parts,
       help_wanted_prompt: plan.help_wanted_prompt,

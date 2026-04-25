@@ -1,1 +1,97 @@
-[]
+[
+  {
+    "id": "177cbb19-03d5-4d67-b208-66ff51abd057",
+    "title": "Peter",
+    "track_ids": [
+      "984dfc8e-0593-4e62-b1f4-04b961f2fed8"
+    ],
+    "conductor_notes": "These 1 track share a compatible tempo and mood. Start with Guitar, then layer supporting parts to preserve space in the arrangement.",
+    "missing_parts": [
+      "bass line",
+      "harmony vocals",
+      "ambient texture"
+    ],
+    "help_wanted_prompt": "This composition could use bass line to complete the arrangement.",
+    "createdAt": "2026-04-25T19:31:37.864Z"
+  },
+  {
+    "id": "3a2efae1-18c6-4211-8d98-90207f54d0cd",
+    "title": "Peter",
+    "track_ids": [
+      "984dfc8e-0593-4e62-b1f4-04b961f2fed8",
+      "9c583cbc-459e-46c4-98c1-be155c0abe02"
+    ],
+    "conductor_notes": "These 2 tracks share a compatible tempo and mood. Start with Guitar, then layer supporting parts to preserve space in the arrangement.",
+    "missing_parts": [
+      "bass line",
+      "harmony vocals",
+      "ambient texture"
+    ],
+    "help_wanted_prompt": "This composition could use bass line to complete the arrangement.",
+    "createdAt": "2026-04-25T19:34:05.695Z"
+  },
+  {
+    "id": "81058f41-87ef-4bfd-839b-5584f596d83b",
+    "title": "Peter",
+    "track_ids": [
+      "984dfc8e-0593-4e62-b1f4-04b961f2fed8",
+      "9c583cbc-459e-46c4-98c1-be155c0abe02"
+    ],
+    "conductor_notes": "These 2 tracks share a compatible tempo and mood. Start with Guitar, then layer supporting parts to preserve space in the arrangement.",
+    "missing_parts": [
+      "bass line",
+      "harmony vocals",
+      "ambient texture"
+    ],
+    "help_wanted_prompt": "This composition could use bass line to complete the arrangement.",
+    "createdAt": "2026-04-25T19:36:45.186Z"
+  },
+  {
+    "id": "c0b1173e-9d02-41d4-b1ef-6dbb64d871f2",
+    "title": "Peter",
+    "track_ids": [
+      "984dfc8e-0593-4e62-b1f4-04b961f2fed8",
+      "9c583cbc-459e-46c4-98c1-be155c0abe02"
+    ],
+    "conductor_notes": "These 2 tracks share a compatible tempo and mood. Start with Guitar, then layer supporting parts to preserve space in the arrangement.",
+    "missing_parts": [
+      "bass line",
+      "harmony vocals",
+      "ambient texture"
+    ],
+    "help_wanted_prompt": "This composition could use bass line to complete the arrangement.",
+    "createdAt": "2026-04-25T19:36:48.953Z"
+  },
+  {
+    "id": "fd3efe8e-c2a9-4b45-a04a-29f64649f3a8",
+    "title": "Peter",
+    "track_ids": [
+      "984dfc8e-0593-4e62-b1f4-04b961f2fed8",
+      "9c583cbc-459e-46c4-98c1-be155c0abe02"
+    ],
+    "conductor_notes": "These 2 tracks share a compatible tempo and mood. Start with Guitar, then layer supporting parts to preserve space in the arrangement.",
+    "missing_parts": [
+      "bass line",
+      "harmony vocals",
+      "ambient texture"
+    ],
+    "help_wanted_prompt": "This composition could use bass line to complete the arrangement.",
+    "createdAt": "2026-04-25T19:36:49.631Z"
+  },
+  {
+    "id": "34387ca4-3fe4-425a-a339-07d3be5f6a99",
+    "title": "Peter",
+    "track_ids": [
+      "984dfc8e-0593-4e62-b1f4-04b961f2fed8",
+      "9c583cbc-459e-46c4-98c1-be155c0abe02"
+    ],
+    "conductor_notes": "These 2 tracks share a compatible tempo and mood. Start with Guitar, then layer supporting parts to preserve space in the arrangement.",
+    "missing_parts": [
+      "bass line",
+      "harmony vocals",
+      "ambient texture"
+    ],
+    "help_wanted_prompt": "This composition could use bass line to complete the arrangement.",
+    "createdAt": "2026-04-25T19:36:50.440Z"
+  }
+]
