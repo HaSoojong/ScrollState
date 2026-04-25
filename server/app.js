@@ -2,6 +2,7 @@
 // and mounts the /api/tracks and /api/compositions routers
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const tracksRouter = require('./routes/tracks');
@@ -10,13 +11,19 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// TODO: configure middleware (cors, express.json, static uploads serving)
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// TODO: mount routers
-// app.use('/api/tracks', tracksRouter);
-// app.use('/api/compositions', compositionsRouter);
+// Serve uploaded audio files statically
+app.use('/uploads', express.static(path.join(__dirname, '../data/uploads')));
 
-// TODO: mount global error handler
-// app.use(errorHandler);
+// Mount routers
+app.use('/api/tracks', tracksRouter);
+app.use('/api/compositions', compositionsRouter);
+
+// Mount global error handler (must be last)
+app.use(errorHandler);
 
 module.exports = app;

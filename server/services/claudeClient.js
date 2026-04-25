@@ -13,18 +13,27 @@ let _client = null;
  * @returns {Anthropic}
  */
 function getClient() {
-  // TODO: implement — initialize with process.env.ANTHROPIC_API_KEY
+  if (!_client) {
+    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  }
+  return _client;
 }
 
 /**
  * Sends a messages.create request to Claude and returns the response text.
- * @param {object} params - Parameters for Anthropic messages.create
- * @param {string} params.system - System prompt
- * @param {Array}  params.messages - Messages array
+ * @param {string} systemPrompt - System prompt string
+ * @param {string} userMessage - User message string
  * @returns {Promise<string>} Claude's response text
  */
-async function callClaude({ system, messages }) {
-  // TODO: implement
+async function callClaude(systemPrompt, userMessage) {
+  const client = getClient();
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2048,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: userMessage }],
+  });
+  return response.content[0].text;
 }
 
 module.exports = { getClient, callClaude };

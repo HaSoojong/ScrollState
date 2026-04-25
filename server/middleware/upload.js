@@ -2,12 +2,31 @@
 // stores files to data/uploads/, enforces MIME type and size limits
 'use strict';
 
+const path = require('path');
 const multer = require('multer');
 
-// TODO: configure multer disk storage (destination, filename)
-// TODO: configure file filter (accept audio/mpeg, audio/wav only)
-// TODO: set file size limit from process.env.MAX_FILE_SIZE_BYTES
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../../data/uploads'));
+  },
+  filename: function (req, file, cb) {
+    const sanitized = file.originalname.replace(/\s+/g, '_');
+    cb(null, Date.now() + '-' + sanitized);
+  },
+});
 
-const uploadMiddleware = null; // TODO: replace with configured multer().single('audio')
+function fileFilter(req, file, cb) {
+  if (file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/wav') {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only MP3 and WAV are allowed.'));
+  }
+}
+
+const uploadMiddleware = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 50 * 1024 * 1024 },
+}).single('audio');
 
 module.exports = { uploadMiddleware };

@@ -12,7 +12,7 @@ const MAX_DURATION_SECONDS = 60;
  * @returns {boolean}
  */
 function isValidMimeType(mimetype) {
-  // TODO: implement
+  return ALLOWED_MIME_TYPES.includes(mimetype);
 }
 
 /**
@@ -21,7 +21,7 @@ function isValidMimeType(mimetype) {
  * @returns {boolean}
  */
 function isValidDuration(durationSeconds) {
-  // TODO: implement
+  return durationSeconds >= MIN_DURATION_SECONDS && durationSeconds <= MAX_DURATION_SECONDS;
 }
 
 module.exports = { isValidMimeType, isValidDuration, ALLOWED_MIME_TYPES, MIN_DURATION_SECONDS, MAX_DURATION_SECONDS };
