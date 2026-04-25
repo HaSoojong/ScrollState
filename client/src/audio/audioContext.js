@@ -5,6 +5,13 @@
  * Returns the shared AudioContext instance, creating it on first call.
  * @returns {AudioContext}
  */
+let audioContext;
+
 export function getAudioContext() {
-  // TODO: implement
+  if (!audioContext) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContextClass();
+  }
+
+  return audioContext;
 }

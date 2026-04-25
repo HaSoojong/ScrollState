@@ -35,6 +35,6 @@ export async function getCompositionById(id) {
  * @returns {Promise<object>} updated Composition object
  */
 export async function addTrackToComposition(compositionId, trackId) {
-  const response = await axios.post(`/api/compositions/${compositionId}/tracks`, { trackId });
+  const response = await axios.post(`/api/compositions/${compositionId}/add`, { trackId });
   return response.data;
 }

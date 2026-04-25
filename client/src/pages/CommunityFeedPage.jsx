@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { generateComposition, getAllCompositions } from '../api/compositionsApi';
 import CompositionCard from '../components/feed/CompositionCard';
@@ -79,7 +80,12 @@ export default function CommunityFeedPage() {
 
   return (
     <section className="mx-auto max-w-7xl px-5 py-10 sm:py-14">
-      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <motion.div
+        className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-orchestra-300">
             AI studio
@@ -87,20 +93,30 @@ export default function CommunityFeedPage() {
           <h1 className="mt-3 text-4xl font-black text-white sm:text-5xl">Compositions</h1>
         </div>
         <div className="flex flex-wrap gap-3">
-          <button className="btn-primary" onClick={handleGenerate} disabled={isGenerating}>
+          <motion.button
+            className="btn-primary"
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            whileHover={{ y: -2, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
             {isGenerating ? 'Generating...' : 'Generate New Matches'}
-          </button>
+          </motion.button>
+          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
           <Link to="/" className="btn-secondary">
             Upload Another Track
           </Link>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {compositions.map((composition, index) => (
-          <CompositionCard key={composition.id || composition.title} composition={composition} index={index} />
-        ))}
-      </div>
+      <motion.div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" layout>
+        <AnimatePresence initial={false}>
+          {compositions.map((composition, index) => (
+            <CompositionCard key={composition.id || composition.title} composition={composition} index={index} />
+          ))}
+        </AnimatePresence>
+      </motion.div>
     </section>
   );
 }

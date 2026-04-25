@@ -6,6 +6,20 @@ const fileStorage = require('../services/fileStorage');
 const conductorAgent = require('../services/conductorAgent');
 const { generateId } = require('../utils/uuid');
 
+function enrichComposition(composition, tracks) {
+  const compositionTracks = tracks.filter((track) => (composition.track_ids || []).includes(track.id));
+  const firstTrack = compositionTracks[0] || {};
+
+  return {
+    ...composition,
+    tracks: compositionTracks,
+    instruments: compositionTracks.map((track) => track.instrument).filter(Boolean),
+    genre: firstTrack.genre || 'Collaborative',
+    bpm: firstTrack.bpm_detected || 96,
+    mood: firstTrack.analysis?.mood || 'Evolving',
+  };
+}
+
 /**
  * POST /api/compositions/generate
  * Calls the conductor agent to match analyzed tracks into a new composition.
@@ -46,7 +60,8 @@ async function generateComposition(req, res, next) {
 async function getAllCompositions(req, res, next) {
   try {
     const compositions = await fileStorage.readAll('compositions.json');
-    return res.status(200).json(compositions);
+    const tracks = await fileStorage.readAll('tracks.json');
+    return res.status(200).json(compositions.map((composition) => enrichComposition(composition, tracks)));
   } catch (err) {
     next(err);
   }
@@ -62,7 +77,8 @@ async function getCompositionById(req, res, next) {
     if (!composition) {
       return res.status(404).json({ error: 'Composition not found' });
     }
-    return res.status(200).json(composition);
+    const tracks = await fileStorage.readAll('tracks.json');
+    return res.status(200).json(enrichComposition(composition, tracks));
   } catch (err) {
     next(err);
   }

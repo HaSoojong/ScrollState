@@ -4,6 +4,7 @@
 
 const path = require('path');
 const multer = require('multer');
+const { isValidMimeType } = require('../utils/audioValidation');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -16,10 +17,10 @@ const storage = multer.diskStorage({
 });
 
 function fileFilter(req, file, cb) {
-  if (file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/wav') {
+  if (isValidMimeType(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only MP3 and WAV are allowed.'));
+    cb(new Error('Invalid file type. Please upload a browser-readable audio file.'));
   }
 }
 

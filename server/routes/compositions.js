@@ -16,5 +16,6 @@ router.get('/:id', compositionsController.getCompositionById);
 
 // POST /api/compositions/:id/add — add a track to an existing composition
 router.post('/:id/add', compositionsController.addTrackToComposition);
+router.post('/:id/tracks', compositionsController.addTrackToComposition);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 
 export default function DropZone({ selectedFile, onFileSelected }) {
   const inputRef = useRef(null);
@@ -11,8 +12,15 @@ export default function DropZone({ selectedFile, onFileSelected }) {
   }
 
   return (
-    <div
+    <motion.div
       className={`drop-zone ${isDragging ? 'drop-zone-active' : ''}`}
+      animate={{
+        scale: isDragging ? 1.02 : 1,
+        borderColor: isDragging ? 'rgba(125, 211, 252, 0.95)' : 'rgba(100, 116, 139, 1)',
+      }}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.99 }}
+      transition={{ type: 'spring', stiffness: 360, damping: 26 }}
       onDragOver={(event) => {
         event.preventDefault();
         setIsDragging(true);
@@ -41,6 +49,6 @@ export default function DropZone({ selectedFile, onFileSelected }) {
       />
       <p className="text-lg font-bold text-white">{selectedFile ? selectedFile.name : 'Drag audio file here'}</p>
       <p className="mt-2 text-sm text-slate-400">MP3, WAV, M4A, or any browser-readable audio file</p>
-    </div>
+    </motion.div>
   );
 }

@@ -1,8 +1,8 @@
-// Audio file validation utilities — checks MIME type (MP3/WAV only)
+// Audio file validation utilities — checks MIME type
 // and duration constraints (15–60 seconds) before processing
 'use strict';
 
-const ALLOWED_MIME_TYPES = ['audio/mpeg', 'audio/wav', 'audio/x-wav'];
+const ALLOWED_MIME_TYPES = ['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/m4a', 'audio/aac'];
 const MIN_DURATION_SECONDS = 15;
 const MAX_DURATION_SECONDS = 60;
 
@@ -12,7 +12,7 @@ const MAX_DURATION_SECONDS = 60;
  * @returns {boolean}
  */
 function isValidMimeType(mimetype) {
-  return ALLOWED_MIME_TYPES.includes(mimetype);
+  return ALLOWED_MIME_TYPES.includes(mimetype) || mimetype.startsWith('audio/');
 }
 
 /**

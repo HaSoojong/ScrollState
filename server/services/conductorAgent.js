@@ -20,6 +20,24 @@ const SYSTEM_PROMPT = `You are an orchestral conductor building compositions fro
  * }>}
  */
 async function conductComposition(tracks) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    const sortedTracks = [...tracks].sort((a, b) => (a.bpm_detected || 96) - (b.bpm_detected || 96));
+    const selectedTracks = sortedTracks.slice(0, Math.min(sortedTracks.length, 4));
+    const primary = selectedTracks[0] || {};
+    const instruments = selectedTracks.map((track) => track.instrument).filter(Boolean);
+    const missingParts = ['bass line', 'harmony vocals', 'ambient texture'].filter(
+      (part) => !instruments.some((instrument) => part.toLowerCase().includes(instrument.toLowerCase())),
+    );
+
+    return {
+      title: primary.piece_name || `${primary.genre || 'Collaborative'} Session`,
+      track_ids: selectedTracks.map((track) => track.id),
+      conductor_notes: `These ${selectedTracks.length} track${selectedTracks.length === 1 ? '' : 's'} share a compatible tempo and mood. Start with ${primary.instrument || 'the foundation track'}, then layer supporting parts to preserve space in the arrangement.`,
+      missing_parts: missingParts.length ? missingParts : ['lead melody'],
+      help_wanted_prompt: `This composition could use ${missingParts[0] || 'a lead melody'} to complete the arrangement.`,
+    };
+  }
+
   const userMessage = `Review these analyzed tracks and create a composition:
 
 ${tracks.map((t, i) => `Track ${i + 1}:

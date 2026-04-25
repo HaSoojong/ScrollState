@@ -17,21 +17,26 @@ async function uploadTrack(req, res, next) {
       return res.status(400).json({ error: 'No audio file uploaded' });
     }
 
-    const duration = parseFloat(req.body.duration);
+    const duration = parseFloat(req.body.duration || req.body.durationSeconds || req.body.duration_seconds);
     if (!isValidDuration(duration)) {
       return res.status(400).json({ error: 'Duration must be between 15 and 60 seconds' });
     }
+
+    const pieceName = req.body.piece_name || req.body.name || req.body.title || null;
+    const userDescription = req.body.user_description || req.body.description || '';
 
     const track = {
       id: generateId(),
       filename: req.file.filename,
       originalName: req.file.originalname,
+      file_url: `/uploads/${encodeURIComponent(req.file.filename)}`,
       mimetype: req.file.mimetype,
       size: req.file.size,
       instrument: req.body.instrument,
       genre: req.body.genre,
-      piece_name: req.body.piece_name || null,
-      user_description: req.body.user_description || '',
+      piece_name: pieceName,
+      name: pieceName,
+      user_description: userDescription,
       bpm_detected: parseFloat(req.body.bpm_detected) || null,
       dominant_freq_range: req.body.dominant_freq_range || null,
       duration,
